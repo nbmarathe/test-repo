@@ -162,31 +162,28 @@ def _time_string(value: object) -> str:
 
 def process_tradebook(raw_df: pd.DataFrame) -> pd.DataFrame:
     df = raw_df.copy()
+    df["trade_type"] = df["trade_type"].astype(str).str.upper().str.strip()
     df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce").fillna(0.0)
     df["price"] = pd.to_numeric(df["price"], errors="coerce").fillna(0.0)
     df["trade_date"] = pd.to_datetime(df["trade_date"], errors="coerce").dt.strftime("%Y-%m-%d")
     df["trade_time"] = df["order_execution_time"].apply(_time_string)
 
     grouped = (
-        df.groupby(["order_id", "trade_type"], dropna=False)
+        df.assign(weighted=(df["quantity"] * df["price"]))
+        .groupby(["order_id", "trade_type"], dropna=False)
         .agg(
             symbol=("symbol", "first"),
             trade_date=("trade_date", "first"),
             trade_time=("trade_time", "first"),
             quantity=("quantity", "sum"),
-            weighted_sum=("price", lambda s: 0.0),
+            weighted=("weighted", "sum"),
         )
         .reset_index()
     )
-
-    weights = df.assign(weighted=df["quantity"] * df["price"]).groupby(["order_id", "trade_type"], dropna=False).agg(
-        weighted=("weighted", "sum"),
-        qty=("quantity", "sum"),
+    grouped["price"] = grouped.apply(
+        lambda r: (r["weighted"] / r["quantity"]) if r["quantity"] else 0.0,
+        axis=1,
     )
-    weights["price"] = weights.apply(lambda r: (r["weighted"] / r["qty"]) if r["qty"] else 0.0, axis=1)
-    weights = weights.reset_index()[["order_id", "trade_type", "price"]]
-
-    grouped = grouped.merge(weights, on=["order_id", "trade_type"], how="left")
     grouped["quantity"] = grouped["quantity"].round(2)
     grouped["price"] = grouped["price"].fillna(0.0).round(2)
     grouped["trade_value"] = (grouped["quantity"] * grouped["price"]).round(2)
