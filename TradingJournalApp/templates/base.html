@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradingJournalApp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div class="flex min-h-screen">
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 p-6 hidden md:block">
+      <h1 class="text-xl font-bold mb-8">TradingJournalApp</h1>
+      <nav class="space-y-2">
+        <a href="/import" class="block px-3 py-2 rounded hover:bg-slate-800">Import</a>
+        <a href="/open_trades" class="block px-3 py-2 rounded hover:bg-slate-800">Open Trades</a>
+        <a href="/summary" class="block px-3 py-2 rounded hover:bg-slate-800">Trade Summary</a>
+        <a href="/analytics" class="block px-3 py-2 rounded hover:bg-slate-800">Analytics</a>
+      </nav>
+    </aside>
+    <main class="flex-1 p-4 md:p-8 overflow-x-auto">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

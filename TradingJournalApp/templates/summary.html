@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-semibold mb-6">Trade Summary</h2>
+<form class="mb-6">
+  <label for="year" class="mr-2">Year</label>
+  <select id="year" name="year" class="bg-slate-900 border border-slate-700 rounded px-3 py-2" onchange="this.form.submit()">
+    {% for y in years %}
+      <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<h3 class="text-lg font-semibold mb-2">Monthly Summary</h3>
+<div class="overflow-x-auto mb-8">
+<table class="min-w-full text-sm bg-slate-900 border border-slate-800 rounded">
+  <thead class="bg-slate-800"><tr>
+    <th class="p-2">Month</th><th class="p-2">Average Gain</th><th class="p-2">Average Loss</th><th class="p-2">WIN %</th>
+    <th class="p-2">Total Trades</th><th class="p-2">Largest Gain</th><th class="p-2">Largest Loss</th>
+    <th class="p-2">Average Days Gains</th><th class="p-2">Average Days Loss</th>
+  </tr></thead>
+  <tbody>
+    {% for row in monthly_rows %}
+      <tr class="border-t border-slate-800">
+        <td class="p-2">{{ row['month'] }}</td><td class="p-2">{{ row['Average Gain'] }}</td><td class="p-2">{{ row['Average Loss'] }}</td>
+        <td class="p-2">{{ row['WIN %'] }}</td><td class="p-2">{{ row['Total Trades'] }}</td><td class="p-2">{{ row['Largest Gain'] }}</td>
+        <td class="p-2">{{ row['Largest Loss'] }}</td><td class="p-2">{{ row['Average Days Gains'] }}</td><td class="p-2">{{ row['Average Days Loss'] }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h3 class="text-lg font-semibold mb-2">Quarterly Summary</h3>
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm bg-slate-900 border border-slate-800 rounded">
+  <thead class="bg-slate-800"><tr><th class="p-2">Metric</th><th class="p-2">Q1</th><th class="p-2">Q2</th><th class="p-2">Q3</th><th class="p-2">Q4</th></tr></thead>
+  <tbody>
+    {% for metric in ['Winning Percentage','Average Gain','Average Loss','Win/Loss Ratio','Adjusted Win/Loss Ratio'] %}
+    <tr class="border-t border-slate-800">
+      <td class="p-2">{{ metric }}</td>
+      <td class="p-2">{{ quarterly['Q1'][metric] }}</td>
+      <td class="p-2">{{ quarterly['Q2'][metric] }}</td>
+      <td class="p-2">{{ quarterly['Q3'][metric] }}</td>
+      <td class="p-2">{{ quarterly['Q4'][metric] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

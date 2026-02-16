@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-semibold mb-6">Analytics</h2>
+<form class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6 bg-slate-900 p-4 rounded border border-slate-800">
+  <input type="date" name="start_date" value="{{ filters.start_date }}" class="bg-slate-800 rounded px-2 py-2">
+  <input type="date" name="end_date" value="{{ filters.end_date }}" class="bg-slate-800 rounded px-2 py-2">
+  <select name="symbol" class="bg-slate-800 rounded px-2 py-2">
+    <option value="">All Symbols</option>
+    {% for s in symbols %}<option value="{{ s }}" {% if filters.symbol == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="trade_outcome" class="bg-slate-800 rounded px-2 py-2">
+    <option value="">All Outcomes</option>
+    {% for o in ['Win','Loss','Breakeven'] %}<option {% if filters.trade_outcome == o %}selected{% endif %}>{{ o }}</option>{% endfor %}
+  </select>
+  <select name="trade_status" class="bg-slate-800 rounded px-2 py-2">
+    <option value="">All Status</option>
+    {% for s in ['Open','Closed'] %}<option {% if filters.trade_status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <button class="md:col-span-5 bg-indigo-600 px-4 py-2 rounded">Apply Filters</button>
+</form>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Total PnL<br><span class="text-lg font-bold">{{ metrics.total_pnl }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Win %<br><span class="text-lg font-bold">{{ metrics.win_pct }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Average Gain<br><span class="text-lg font-bold">{{ metrics.average_gain }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Average Loss<br><span class="text-lg font-bold">{{ metrics.average_loss }}</span></div>
+</div>
+
+<div class="bg-slate-900 border border-slate-800 rounded p-4 mb-6">
+  <canvas id="pnlChart" height="100"></canvas>
+</div>
+
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm bg-slate-900 border border-slate-800 rounded">
+  <thead class="bg-slate-800">
+    <tr>
+      {% for c in ['Symbol','Buy Date','Buy Quantity','Buy Price','Sell Date','Sell Quantity','Sell Price','PnL','Trade Status','Trade Outcome'] %}
+      <th class="p-2">{{ c }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr class="border-t border-slate-800">
+      <td class="p-2">{{ row['Symbol'] }}</td><td class="p-2">{{ row['Buy Date'] }}</td><td class="p-2">{{ row['Buy Quantity'] }}</td>
+      <td class="p-2">{{ row['Buy Price'] }}</td><td class="p-2">{{ row['Sell Date'] }}</td><td class="p-2">{{ row['Sell Quantity'] }}</td>
+      <td class="p-2">{{ row['Sell Price'] }}</td><td class="p-2">{{ row['PnL'] }}</td><td class="p-2">{{ row['Trade Status'] }}</td><td class="p-2">{{ row['Trade Outcome'] }}</td>
+    </tr>
+    {% else %}
+      <tr><td class="p-3 text-center text-slate-400" colspan="10">No records found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('pnlChart');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: {{ chart_labels|tojson }},
+    datasets: [{
+      label: 'Cumulative PnL',
+      data: {{ chart_values|tojson }},
+      borderColor: '#6366F1',
+      backgroundColor: 'rgba(99,102,241,0.2)',
+      tension: 0.2
+    }]
+  },
+  options: {plugins: {legend: {labels: {color: '#E2E8F0'}}}, scales: {x: {ticks:{color:'#CBD5E1'}}, y: {ticks:{color:'#CBD5E1'}}}}
+});
+</script>
+{% endblock %}
