@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<meta http-equiv="refresh" content="300">
+<h2 class="text-2xl font-semibold mb-6">Open Trades</h2>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Total Open Trades<br><span class="text-xl font-bold">{{ stats.total_open_trades }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Risk Free Trades<br><span class="text-xl font-bold">{{ stats.risk_free_trades }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Trades With Open Risk<br><span class="text-xl font-bold">{{ stats.trades_with_open_risk }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Total Risk<br><span class="text-xl font-bold">{{ stats.total_risk }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Monthly PnL<br><span class="text-xl font-bold">{{ stats.monthly_pnl }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Quarterly PnL<br><span class="text-xl font-bold">{{ stats.quarterly_pnl }}</span></div>
+  <div class="bg-slate-900 border border-slate-800 p-4 rounded">Annual PnL<br><span class="text-xl font-bold">{{ stats.annual_pnl }}</span></div>
+</div>
+
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm bg-slate-900 border border-slate-800 rounded">
+  <thead class="bg-slate-800 text-slate-200">
+    <tr>
+      <th class="p-2">Symbol</th><th class="p-2">Set up</th><th class="p-2">Buy Quantity</th><th class="p-2">Open Quantity</th>
+      <th class="p-2">Buy Price</th><th class="p-2">Stop Loss</th><th class="p-2">Current Price</th>
+      <th class="p-2">Sell Quantity</th><th class="p-2">Sell Price</th><th class="p-2">Booked PnL</th>
+      <th class="p-2">Open PnL</th><th class="p-2">Open Risk</th><th class="p-2">Save</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr class="border-t border-slate-800">
+      <form action="/update_trade" method="post">
+        <td class="p-2">{{ row['Symbol'] }}<input type="hidden" name="row_index" value="{{ row['row_index'] }}"></td>
+        <td class="p-2"><input name="setup" value="{{ row['Set up'] }}" class="bg-slate-800 rounded px-2 py-1 w-32"></td>
+        <td class="p-2">{{ row['Buy Quantity'] }}</td>
+        <td class="p-2">{{ row['Open Quantity'] }}</td>
+        <td class="p-2">{{ row['Buy Price'] }}</td>
+        <td class="p-2"><input name="stop_loss" value="{{ row['Stop Loss'] }}" class="bg-slate-800 rounded px-2 py-1 w-24"></td>
+        <td class="p-2">{{ row['Current Price'] }}</td>
+        <td class="p-2">{{ row['Sell Quantity'] }}</td>
+        <td class="p-2">{{ row['Sell Price'] }}</td>
+        <td class="p-2">{{ row['Booked PnL'] }}</td>
+        <td class="p-2">{{ row['Open PnL'] }}</td>
+        <td class="p-2">{{ row['Open Risk'] }}</td>
+        <td class="p-2"><button class="bg-indigo-600 px-3 py-1 rounded">Update</button></td>
+      </form>
+    </tr>
+    {% else %}
+      <tr><td class="p-3 text-center text-slate-400" colspan="13">No open trades found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
